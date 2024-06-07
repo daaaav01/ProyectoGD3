@@ -14,7 +14,9 @@ TILE_SIZE = 34
 lvl1 = 'imgs/fondo_lvl1.png'
 lvl2 = 'imgs/lvl2.jpg'
 
-
+# Estados del juego
+MENU = "menu"
+GAME = "game"
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, width, height, img_path):
@@ -112,6 +114,7 @@ class Game:
         for spike in self.spike:
             surface.blit(spike.image, self.camera.apply(spike.rect))
         surface.blit(self.player.sprite.image, self.camera.apply(self.player.sprite.rect))
+        
 
 def show_game_over(surface):
         font = pygame.font.Font(None, 100)
@@ -119,6 +122,24 @@ def show_game_over(surface):
         text_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         surface.blit(game_over_text, text_rect)
         pygame.display.flip() 
+
+class Menu:
+    def __init__(self, surface):
+        self.surface = surface
+        self.background_image = load_image("imgs/inicio_juego.jpg")
+        self.backround_rect = self.background_image.get_rect()
+        self.state = MENU
+        
+    def show_start_screen(self): #pantalla de inicio
+        self.image_button = load_image("imgs/start.png", (100, 50))
+        self.button_rect = self.image_button.get_rect(center=(WIDTH // 2, (HEIGHT // 1.3)))
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.mouse_pos = pygame.mouse.get_pos()
+                self.mouse_rect = pygame.Rect(self.mouse_pos, (1, 1))  # Crear un rectángulo pequeño en la posición del ratón
+                if self.button_rect.contains(self.mouse_rect):
+                    self.state = GAME
+        self.surface.blit(self.image_button, self.button_rect)
 
 def draw_grid(surface):
     for y in range(TILE_SIZE, WIDTH, TILE_SIZE):
@@ -129,20 +150,26 @@ def draw_grid(surface):
 
 if __name__ == '__main__':
     game = Game('map.txt', lvl2)
+    menu= Menu(screen)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        screen.blit(game.background_image, game.backround_rect)
-
-        if not game.game_over:
-            game.update()
-            game.draw(screen)
-            #draw_grid(screen)
-        else:
-            show_game_over(screen)
+        if menu.state == MENU:
+            screen.blit(menu.background_image, menu.backround_rect)
+            menu.show_start_screen()
+        if menu.state == GAME:
+            if not game.game_over:
+                screen.blit(game.background_image, game.backround_rect)
+                game.update()
+                game.draw(screen)
+                #draw_grid(screen)
+            else:
+                show_game_over(screen)
+                
         
         clock.tick(FPS)
         pygame.display.update()
