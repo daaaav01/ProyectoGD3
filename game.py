@@ -11,12 +11,18 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 TILE_SIZE = 34
 
+lvl1 = 'imgs/fondo_lvl1.png'
+lvl2 = 'imgs/lvl2.jpg'
+
+
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos, width, height, img_path):
         super().__init__()
         self.image = load_image(img_path, (width, height))
         self.rect = self.image.get_rect(topleft = pos)
         self.mask = pygame.mask.from_surface(self.image)
+        
 
 class Spike(pygame.sprite.Sprite):
     def __init__(self, pos, width, height, img_path):
@@ -28,10 +34,13 @@ class Spike(pygame.sprite.Sprite):
                     #spike
 
 class Game:
-    def __init__(self, map_path):
+    def __init__(self, map_path, nivel):
         from camera import Camera
         self.blocks = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.background_image = load_image(nivel)
+        self.backround_rect = self.background_image.get_rect()
+        self.game_over = False
 
         self.spike = pygame.sprite.Group() #spike
 
@@ -65,13 +74,11 @@ class Game:
         player.rect.x = player.pos.x
         for block in self.blocks:
             if block.rect.colliderect(player.rect):
-                pygame.quit()
-                sys.exit()
+                self.game_over = True
         
         for spike in self.spike:
             if spike.mask.overlap(player.mask, (player.rect.x - spike.rect.x, player.rect.y - spike.rect.y)):
-                pygame.quit()
-                sys.exit()
+                self.game_over = True
   
                 
     def vertical_movement(self):
@@ -106,6 +113,13 @@ class Game:
             surface.blit(spike.image, self.camera.apply(spike.rect))
         surface.blit(self.player.sprite.image, self.camera.apply(self.player.sprite.rect))
 
+def show_game_over(surface):
+        font = pygame.font.Font(None, 100)
+        game_over_text = font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        surface.blit(game_over_text, text_rect)
+        pygame.display.flip() 
+
 def draw_grid(surface):
     for y in range(TILE_SIZE, WIDTH, TILE_SIZE):
         pygame.draw.line(surface, 'red', (y, 0), (y, HEIGHT))
@@ -114,15 +128,21 @@ def draw_grid(surface):
         pygame.draw.line(surface, 'blue', (0, x), (WIDTH, x))
 
 if __name__ == '__main__':
-    game = Game('map.txt')
+    game = Game('map.txt', lvl2)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        screen.fill('lightblue')
-        game.update()
-        game.draw(screen)
-        #draw_grid(screen)
+
+        screen.blit(game.background_image, game.backround_rect)
+
+        if not game.game_over:
+            game.update()
+            game.draw(screen)
+            #draw_grid(screen)
+        else:
+            show_game_over(screen)
+        
         clock.tick(FPS)
         pygame.display.update()
