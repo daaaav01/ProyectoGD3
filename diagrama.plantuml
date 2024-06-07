@@ -1,0 +1,81 @@
+@startuml
+
+class Block {
+    - image: pygame.Surface
+    - rect: pygame.Rect
+    - mask: pygame.mask.Mask
+    + __init__(pos: Tuple[int, int], width: int, height: int, img_path: str)
+}
+
+class Spike {
+    - image: pygame.Surface
+    - rect: pygame.Rect
+    - mask: pygame.mask.Mask
+    + __init__(pos: Tuple[int, int], width: int, height: int, img_path: str)
+}
+
+class Game {
+    - blocks: pygame.sprite.Group()
+    - player: pygame.sprite.GroupSingle()
+    - background_image: pygame.Surface
+    - background_rect: pygame.Rect
+    - game_over: bool
+    - spike: pygame.sprite.Group()
+    - map: List[str]
+    - map_width: int
+    - map_height: int
+    - camera: Camera
+    - show_has_ganado: bool
+    + __init__(map_path: str, nivel: str)
+    + read_file(path: str) -> List[str]
+    + load_map()
+    + horizontal_movement()
+    + vertical_movement()
+    + update()
+    + draw(surface: pygame.Surface)
+    + show_game_over(surface: pygame.Surface)
+    + show_has_ganado(surface: pygame.Surface)
+}
+
+class Player {
+    - image: pygame.Surface
+    - rect: pygame.Rect
+    - direction: pygame.math.Vector2
+    - gravity: float
+    - pos: pygame.math.Vector2
+    - initial_jump: int
+    - speed: int
+    - on_ground: bool
+    - mask: pygame.mask.Mask
+    + __init__(pos: Tuple[int, int], width: int, height: int, img_path: str)
+    + apply_gravity()
+    + update()
+}
+
+class Camera {
+    - width: int
+    - height: int
+    - rect: pygame.Rect
+    + __init__(width: int, height: int)
+    + apply(target_rect: pygame.Rect) -> pygame.Rect
+    + update(target_rect: pygame.Rect)
+}
+
+class Menu {
+    - surface: pygame.Surface
+    - background_image: pygame.Surface
+    - backround_rect: pygame.Rect
+    - state: str
+    - image_button: pygame.Surface
+    - button_rect: pygame.Rect
+    + __init__(surface: pygame.Surface)
+    + show_start_screen()
+}
+
+Game --> Block
+Game --> Spike
+Game --> Player
+Game --> Camera
+Game --> Menu
+
+@enduml

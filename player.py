@@ -2,7 +2,7 @@ import pygame, sys
 from utils import *
 vec = pygame.math.Vector2
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite): #clase general del jugador
     def __init__(self, pos, width, height, img_path):
         super().__init__()
         self.image = load_image(img_path, (width, height))
@@ -14,16 +14,14 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.on_ground = True
         self.mask = pygame.mask.from_surface(self.image)
-        if self.pos == vec(width) :
-            pygame.quit()
-            sys.exit()
+        
     
-    def apply_gravity(self):
+    def apply_gravity(self): #le aplicamos gravedad
         self.direction.y += self.gravity
         self.pos.y += self.direction.y
         self.rect.y = self.pos.y
     
-    def update(self):
+    def update(self): #su funcion update
         self.direction.x = self.speed
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.on_ground:
