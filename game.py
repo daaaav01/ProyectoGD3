@@ -140,13 +140,18 @@ class Menu:
     def show_start_screen(self): #pantalla de inicio
         self.image_button = load_image("imgs/start.png", (100, 50))
         self.button_rect = self.image_button.get_rect(center=(WIDTH // 2, (HEIGHT // 1.3)))
+        self.surface.blit(self.image_button, self.button_rect)
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.mouse_pos = pygame.mouse.get_pos()
                 self.mouse_rect = pygame.Rect(self.mouse_pos, (1, 1))  # Crear un rectángulo pequeño en la posición del ratón
                 if self.button_rect.contains(self.mouse_rect):
                     self.state = GAME
-        self.surface.blit(self.image_button, self.button_rect)
+    
+    def volver(self):
+        for event in pygame.event.get():
+            if event.type == pygame.K_LEFT:
+                self.state= MENU
 
 def draw_grid(surface): #funcion que genera una rejilla para la creacion del mapa
     for y in range(TILE_SIZE, WIDTH, TILE_SIZE):
@@ -162,22 +167,38 @@ def show_has_ganado(surface): #funcion que genera el texto ganador
     surface.blit(has_ganado_text, text_rect)
     pygame.display.flip() 
 
+def restart_game():
+    global game, menu, screen
+    game = Game('map.txt', lvl1)
+    pygame.mixer.music.load("imgs/music.mp3")
+    pygame.mixer.music.play(1)
+    pygame.mixer.music.set_volume(0.1)
+    menu.state = MENU
+    game.game_over = False
+    game.show_has_ganado = False
+    #pygame.display.flip()
+
 if __name__ == '__main__':
 
     game = Game('map.txt', lvl1)
-    menu = Menu(screen)
-
+    menu = Menu(screen) 
     pygame.mixer.init()
     pygame.mixer.music.load("imgs/music.mp3")
     pygame.mixer.music.play(1)
     pygame.mixer.music.set_volume(0.1)
-
+    
     while True:
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+                    # menu.state = MENU
+                    # game.game_over = False
+                    # game.show_has_ganado = False
+                    # pygame.display.flip()
+                restart_game()
         if menu.state == MENU:
             screen.blit(menu.background_image, menu.backround_rect)
             menu.show_start_screen()
@@ -185,12 +206,13 @@ if __name__ == '__main__':
             if not game.game_over:
                 screen.blit(game.background_image, game.backround_rect)
                 game.update()
-                game.draw(screen)
+                game.draw(screen)    
                 #draw_grid(screen)
             elif game.game_over:
                 show_game_over(screen)
             if game.show_has_ganado:
                 show_has_ganado(screen)
+                
 
 
     
