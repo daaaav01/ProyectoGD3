@@ -1,5 +1,6 @@
 import pygame, sys
 from game import Game, TILE_SIZE, WIDTH, HEIGHT
+from player import Player
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -62,6 +63,45 @@ class GameCamera(Game):
         self.camera = Camera(self.map_width, self.map_height)
         self.player.add(Player((316, 186)))
     
+    
+    def draw(self, surface):
+        player_sprite = self.player.sprite
+        for block in self.blocks:
+            block_rect_from_camera = self.camera.apply(block.rect)
+            if not block.rect.x:
+                x,y = block_rect_from_camera.topright
+                draw_topleft_text(screen, 'apply(rect): ', x, y, 'black')
+                draw_topleft_text(screen, 'x: {}, y: {}'.format(block_rect_from_camera.x, block_rect_from_camera.y), x, y+16, 'black')
+            else:
+                x,y = block_rect_from_camera.topleft
+                draw_topright_text(screen, 'apply(rect): ', x, y, 'black')
+                draw_topright_text(screen, 'x: {}, y: {}'.format(x, y), x, y+16, 'black')
+            surface.blit(block.image, block_rect_from_camera)
+        draw_topright_text(screen, 'update(player_rect) x: {}, y: {}'.format(self.camera.rect.x, self.camera.rect.y), 385, 60, 'black')
+        player_rect_from_camera = self.camera.apply(player_sprite.rect)
+        draw_topright_text(screen, 'apply(rect) x: {}, y: {}'.format(player_rect_from_camera.x, player_rect_from_camera.y), player_rect_from_camera.x, player_rect_from_camera.y, 'black')
+        draw_topright_text(screen, 'rect x: {}, y: {}'.format(player_sprite.rect.x, player_sprite.rect.y), player_rect_from_camera.x, player_rect_from_camera.y+20, 'black')
+        surface.blit(player_sprite.image, player_rect_from_camera)
+
+    def update(self):
+        self.camera.update(self.player.sprite.rect)
+        self.player.update()
+
+if __name__ == '__main__':
+    game = GameCamera()
+    while True:
+        screen.fill('lightblue')
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        game.update()
+        game.draw(screen)
+        pygame.draw.line(screen, 'green', (WIDTH//2, 0), (WIDTH//2, HEIGHT), 2)
+        pygame.draw.line(screen, 'blue', (0, HEIGHT//2), (WIDTH, HEIGHT//2), 2)
+        clock.tick(fps)
+        pygame.display.update()
+
     def draw(self, surface):
         player_sprite = self.player.sprite
         for block in self.blocks:

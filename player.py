@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from utils import *
 vec = pygame.math.Vector2
 
@@ -14,6 +14,9 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.on_ground = True
         self.mask = pygame.mask.from_surface(self.image)
+        if self.pos == vec(width) :
+            pygame.quit()
+            sys.exit()
     
     def apply_gravity(self):
         self.direction.y += self.gravity
@@ -26,3 +29,4 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and self.on_ground:
             self.direction.y = self.initial_jump
             self.on_ground = False
+            

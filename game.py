@@ -41,7 +41,11 @@ class Game:
         self.map_height = len(self.map)*TILE_SIZE
         self.camera = Camera(self.map_width, self.map_height)
 
+        self.show_has_ganado = False
+
         self.load_map()
+    
+   
 
     def read_file(self, path):
         file = ''
@@ -59,10 +63,15 @@ class Game:
                 elif char == 'S':
                     self.spike.add(Spike((x*TILE_SIZE, y*TILE_SIZE), TILE_SIZE, TILE_SIZE, os.path.join('imgs', 'spike.png'))) #spike
 
+
     def horizontal_movement(self):
         player = self.player.sprite
         player.pos.x += player.direction.x
         player.rect.x = player.pos.x
+        
+        if player.rect.right > self.map_width: 
+            self.show_has_ganado = True
+            
         for block in self.blocks:
             if block.rect.colliderect(player.rect):
                 pygame.quit()
@@ -113,16 +122,38 @@ def draw_grid(surface):
     for x in range(TILE_SIZE, HEIGHT, TILE_SIZE):
         pygame.draw.line(surface, 'blue', (0, x), (WIDTH, x))
 
+def show_has_ganado(surface):
+    font = pygame.font.Font(None, 100)
+    has_ganado_text = font.render("Has Ganado", True, (0, 0, 0))
+    text_rect = has_ganado_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    surface.blit(has_ganado_text, text_rect)
+    pygame.display.flip() 
+
 if __name__ == '__main__':
+
     game = Game('map.txt')
+
+    pygame.mixer.init()
+    pygame.mixer.music.load("imgs/music.mp3")
+    pygame.mixer.music.play(1)
+    pygame.mixer.music.set_volume(0.1)
+
     while True:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        
+
         screen.fill('lightblue')
-        game.update()
-        game.draw(screen)
-        #draw_grid(screen)
+        if not game.show_has_ganado:
+
+            game.update()
+            game.draw(screen)
+            #draw_grid(screen)
+        else:
+            show_has_ganado(screen)
+
         clock.tick(FPS)
         pygame.display.update()
