@@ -18,4 +18,4 @@ Este proyecto consiste en recrear el popular juego **Geometry Dash** utilizando 
 
 ## Estructura del Proyecto
 
-![diagrama de clase](out\diagrama\diagrama.png)
+![diagrama de clase](out/diagrama/diagrama.png)
